@@ -133,7 +133,14 @@ class PracticaPruebasApplicationTests {
                     url("/citas/" + cita.getId() + "/confirmar"),null, CitaDTO.class
             );
 
+            cita.setEstado(EstadoCita.CANCELADA);
+            ResponseEntity<CitaDTO> res1 = restTemplate.postForEntity(
+                    url("/citas/" + cita.getId() + "/confirmar"),null, CitaDTO.class
+            );
+
             assertThat(res.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(res1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
         }
         @Test
         @DisplayName("Cuando una cita no existe, devuelve error 404")
@@ -316,8 +323,13 @@ class PracticaPruebasApplicationTests {
                     url("/citas"),cita, CitaDTO.class
             );
 
+            cita.setInicio(LocalDateTime.parse("2026-05-01T17:59:00")); //No debe permitir una cita un minuto antes de que cierre
+            ResponseEntity<CitaDTO> res3 = restTemplate.postForEntity(
+                    url("/citas"),cita, CitaDTO.class
+            );
             assertThat(res1.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
             assertThat(res2.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThat(res3.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         }
     }
 }
